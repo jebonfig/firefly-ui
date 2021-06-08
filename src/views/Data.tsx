@@ -13,6 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 import React, { useState, useEffect, useContext } from 'react';
 import {
   Grid,
@@ -49,7 +50,7 @@ export const Data: React.FC = () => {
   const { selectedNamespace } = useContext(NamespaceContext);
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(PAGE_LIMITS[0]);
-  const { dataView } = useContext(ApplicationContext);
+  const { dataView, lastEvent } = useContext(ApplicationContext);
   const [createdFilter, setCreatedFilter] = useState<CreatedFilterOptions>(
     '24hours'
   );
@@ -128,7 +129,7 @@ export const Data: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [rowsPerPage, currentPage, selectedNamespace, createdFilter]);
+  }, [rowsPerPage, currentPage, selectedNamespace, createdFilter, lastEvent]);
 
   const records: IDataTableRecord[] = dataItems.map((data: IData) => ({
     key: data.id,

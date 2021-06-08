@@ -36,7 +36,6 @@ import { DataTable } from '../../components/DataTable/DataTable';
 import { DataTimeline } from '../../components/DataTimeline/DataTimeline';
 import { HashPopover } from '../../components/HashPopover';
 import { MessageDetails } from './MessageDetails';
-import CheckIcon from 'mdi-react/CheckIcon';
 import BroadcastIcon from 'mdi-react/BroadcastIcon';
 import { NamespaceContext } from '../../contexts/NamespaceContext';
 import { ApplicationContext } from '../../contexts/ApplicationContext';
@@ -56,7 +55,7 @@ export const Messages: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(PAGE_LIMITS[0]);
   const { selectedNamespace } = useContext(NamespaceContext);
-  const { dataView } = useContext(ApplicationContext);
+  const { dataView, lastEvent } = useContext(ApplicationContext);
   const [createdFilter, setCreatedFilter] = useState<CreatedFilterOptions>(
     '24hours'
   );
@@ -103,7 +102,7 @@ export const Messages: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [rowsPerPage, currentPage, selectedNamespace, createdFilter]);
+  }, [rowsPerPage, currentPage, selectedNamespace, createdFilter, lastEvent]);
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     setCurrentPage(newPage);
@@ -133,9 +132,8 @@ export const Messages: React.FC = () => {
   const columnHeaders = [
     t('author'),
     t('type'),
-    t('topic'),
-    t('context'),
-    t('pinned'),
+    t('tag'),
+    t('transactionType'),
     t('dataHash'),
     t('createdOn'),
   ];
@@ -153,9 +151,8 @@ export const Messages: React.FC = () => {
           ),
         },
         { value: message.header.type },
-        { value: message.header.topic },
-        { value: message.header.context },
-        { value: message.header.tx.type === 'pin' ? <CheckIcon /> : undefined },
+        { value: message.header.tag },
+        { value: message.header.txtype },
         {
           value: (
             <HashPopover
@@ -175,8 +172,8 @@ export const Messages: React.FC = () => {
 
   const buildTimelineElements = (messages: IMessage[]): ITimelineItem[] => {
     return messages.map((message: IMessage) => ({
-      title: message.header.datahash,
-      description: message.header.type,
+      title: message.header.type,
+      description: message.header.tag,
       time: dayjs(message.header.created).format('MM/DD/YYYY h:mm A'),
       icon: <BroadcastIcon />,
       onClick: () => {

@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Router, Switch, Route } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import {
@@ -32,7 +32,9 @@ import { AppWrapper } from './components/AppWrapper';
 import { NamespaceContext } from './contexts/NamespaceContext';
 import { ApplicationContext } from './contexts/ApplicationContext';
 import { INamespace, DataView } from './interfaces';
+import ReconnectingWebsocket from 'reconnecting-websocket';
 
+const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 const history = createBrowserHistory({
   basename: process.env.PUBLIC_URL,
 });
@@ -93,6 +95,8 @@ function App() {
   const [namespaces, setNamespaces] = useState<INamespace[]>([]);
   const [selectedNamespace, setSelectedNamespace] = useState<string>('');
   const [dataView, setDataView] = useState<DataView>('list');
+  const ws = useRef<ReconnectingWebsocket | null>(null);
+  const [lastEvent, setLastEvent] = useState<any>();
 
   useEffect(() => {
     fetch('/api/v1/namespaces')
@@ -116,6 +120,20 @@ function App() {
       });
   }, []);
 
+  useEffect(() => {
+    if (selectedNamespace) {
+      ws.current = new ReconnectingWebsocket(
+        `${protocol}://${window.location.hostname}:5000/ws?namespace=${selectedNamespace}&ephemeral&autoack`
+      );
+      ws.current.onmessage = (event: any) => {
+        setLastEvent(event);
+      };
+      ws.current.onerror = (err: any) => {
+        console.log('error', err);
+      };
+    }
+  }, [selectedNamespace]);
+
   if (initializing) {
     return <CircularProgress />;
   }
@@ -131,7 +149,9 @@ function App() {
           setSelectedNamespace,
         }}
       >
-        <ApplicationContext.Provider value={{ dataView, setDataView }}>
+        <ApplicationContext.Provider
+          value={{ dataView, setDataView, lastEvent, setLastEvent }}
+        >
           <Router history={history}>
             <AppWrapper>
               <Switch>

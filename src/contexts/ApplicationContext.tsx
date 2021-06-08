@@ -18,6 +18,8 @@ import React, { Dispatch, SetStateAction } from 'react';
 import { DataView } from '../interfaces';
 
 export interface IApplicationContext {
+  lastEvent: any;
+  setLastEvent: Dispatch<SetStateAction<any>>;
   dataView: DataView;
   setDataView: Dispatch<SetStateAction<DataView>>;
 }
@@ -25,6 +27,10 @@ export interface IApplicationContext {
 export const ApplicationContext = React.createContext<IApplicationContext>({
   dataView: 'list',
   setDataView: () => {
+    /* default value */
+  },
+  lastEvent: undefined,
+  setLastEvent: () => {
     /* default value */
   },
 });
