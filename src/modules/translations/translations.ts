@@ -15,7 +15,9 @@
 // limitations under the License.
 
 import { registerDataTranslations } from '../data/translations/translations';
+import { registerNetworkHealthTranslations } from '../ff-network-health/translations/translations';
 
 export const registerModuleTranslations = (): void => {
   registerDataTranslations();
+  registerNetworkHealthTranslations();
 };

@@ -16,7 +16,8 @@
 
 import { IRoute } from '../../core/interfaces';
 import { DataRoutes } from '../data/routes';
+import { NetworkHealthRoutes } from '../ff-network-health/routes';
 
 export const registerModuleRoutes = (): IRoute[] => {
-  return [...DataRoutes];
+  return [...DataRoutes, ...NetworkHealthRoutes];
 };
