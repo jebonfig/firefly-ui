@@ -1,0 +1,3 @@
+[submodule "src/modules/ff-network-health"]
+	path = src/modules/ff-network-health
+	url = git@github.com:jebonfig/ff-network-health.git
